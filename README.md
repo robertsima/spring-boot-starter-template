@@ -31,8 +31,9 @@ Clone this repo into your own branch and use it to develop your own project.
 If you use this and end up releasing, all I ask for is a reference to this project somehow. 
 
 ## Project Structure Breakdown
-Below is a breakdown of the project structure, not going in depth on specific file documentation, just a breakdown of what each folder's purpose is. 
+Below is a breakdown of the project structure, not going in depth on specific file documentation. 
 
+```text
 your_repo_name/
   pom.xml
   mvnw
@@ -44,9 +45,10 @@ your_repo_name/
         app/MyServiceApplication.java
         config/ - *auth and security config files*
         controller/ - *controllers to define endpoints*
-        dto/ *data transfer objects*
-        model/ - *models and entities representing dbs* 
+        dto/ - *data transfer objects*
+        model/ - *models and entities representing dbs*
         service/ - *seperated interface pattern; contains service interfaces*
-          serviceImpl/ *contains associated service impls for decoupling*
+          serviceImpl/ - *contains associated service impls for decoupling*
       resources/application.properties
-    test/ *same file structure as main, additional integration testing folder - unit tests handled in level above integration*
+    test/ - *same file structure as main, additional integration testing folder - unit tests handled in level above integration*
+```
