@@ -43,12 +43,12 @@ your_repo_name/
     main/
       java/com/example_project_name/
         app/MyServiceApplication.java
-        config/ - *auth and security config files*
-        controller/ - *controllers to define endpoints*
-        dto/ - *data transfer objects*
-        model/ - *models and entities representing dbs*
-        service/ - *seperated interface pattern; contains service interfaces*
-          serviceImpl/ - *contains associated service impls for decoupling*
+        config/ -- auth and security config files --
+        controller/ -- controllers to define endpoints --
+        dto/ -- data transfer objects -- 
+        model/ -- models and entities representing dbs -- 
+        service/ -- seperated interface pattern; contains service interfaces -- 
+          serviceImpl/ -- contains associated service impls for decoupling -- 
       resources/application.properties
-    test/ - *same file structure as main, additional integration testing folder - unit tests handled in level above integration*
+    test/ -- same file structure as main, additional integration testing folder - unit tests handled in level above integration*
 ```
