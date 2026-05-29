@@ -8,10 +8,10 @@
 		<version>4.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.robert.sima.spring.microservice</groupId>
-	<artifactId>template</artifactId>
+	<groupId>com.example_project_name.app</groupId>
+	<artifactId>your_repo_name</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>template</name>
+	<name>MyServiceApplication</name>
 	<description/>
 	<url/>
 	<licenses>
