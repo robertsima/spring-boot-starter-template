@@ -17,7 +17,8 @@ For security purposes, you should never store credentials inside this project - 
 
 ## How to use
 Clone this repo into your own branch and use it to develop your own project.
-'''git clone (git project link)'''
+
+```git clone (git project link)```
 
 1. Modify project folder structure names and file names to match your use case. 
 
