@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: your_repo_name
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uris:
+            - https://<your-keycloak-domain>/realms/your-realm
+            - https://<other-domain>/realms/other-realm
+
+server:
+  port: 8080
+  
+# issuer-uris can be omitted if keycloak.auth-server-url and keycloak.realm are configured.
+
+keycloak:
+  realm: your-realm
+  auth-server-url: https://<your-keycloak-domain>
