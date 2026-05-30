@@ -3,7 +3,7 @@ package com.example_project_name.config;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-import java.util.Map;
+// removed unused java.util.Map import
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,8 +22,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.web.SecurityFilterChain;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSecurity
@@ -74,20 +74,32 @@ public class SpringSecurityConfig {
             throw new IllegalStateException("Missing issuer URIs configuration and no Keycloak issuer configured");
         }
 
-        Map<String, JwtDecoder> decoders = issuerUris.stream()
+        // Normalize and keep a set of allowed issuers. We avoid eagerly creating
+        // remote `JwtDecoder` instances (which perform network calls) during
+        // bean creation because placeholder or unreachable issuer URIs will
+        // otherwise fail application startup with errors like "Bad authority".
+        var allowedIssuers = issuerUris.stream()
                 .map(this::normalizeIssuerUri)
-                .collect(Collectors.toUnmodifiableMap(
-                        issuer -> issuer,
-                        JwtDecoders::fromIssuerLocation,
-                        (existing, replacement) -> existing));
+                .collect(Collectors.toUnmodifiableSet());
+
+        // Cache decoders created on-demand to avoid repeated remote metadata fetches.
+        var decoderCache = new java.util.concurrent.ConcurrentHashMap<String, JwtDecoder>();
 
         return token -> {
             String issuer = getIssuer(token);
-            JwtDecoder decoder = decoders.get(normalizeIssuerUri(issuer));
-            if (decoder == null) {
+            String norm = normalizeIssuerUri(issuer);
+            if (!allowedIssuers.contains(norm)) {
                 throw new BadJwtException("Untrusted issuer: " + issuer);
             }
-            return decoder.decode(token);
+
+            try {
+                // Lazily create (and cache) a decoder for this issuer.
+                JwtDecoder decoder = decoderCache.computeIfAbsent(norm, JwtDecoders::fromIssuerLocation);
+                return decoder.decode(token);
+            } catch (Exception ex) {
+                // Surface a clearer error that the decoder could not be created/used.
+                throw new BadJwtException("Failed to validate token for issuer " + issuer + ": " + ex.getMessage(), ex);
+            }
         };
     }
 
@@ -108,10 +120,10 @@ public class SpringSecurityConfig {
             byte[] decoded = Base64.getUrlDecoder().decode(parts[1]);
             JsonNode json = new ObjectMapper().readTree(new String(decoded, StandardCharsets.UTF_8));
             JsonNode issuer = json.get("iss");
-            if (issuer == null || issuer.asText().isEmpty()) {
+            if (issuer == null || issuer.textValue() == null || issuer.textValue().isEmpty()) {
                 throw new BadJwtException("Missing issuer claim");
             }
-            return issuer.asText();
+            return issuer.textValue();
         } catch (Exception ex) {
             throw new BadJwtException("Unable to parse JWT issuer", ex);
         }
