@@ -1,6 +1,7 @@
-package com.example_project_name.dto;
+package com.example_project_name.controller.dto;
 
 public class UserDTO {
+    
     private String name;
 
     public String getName() {

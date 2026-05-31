@@ -3,7 +3,6 @@ package com.example_project_name.config;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-// removed unused java.util.Map import
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,8 +11,8 @@ import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -28,19 +27,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
+    //This file supports two config styles for trusted JWT issuers:
+    //1) A list of issuer URIs configured via spring.security.oauth2.resourceserver.jwt.issuer-uris
+    //2) A single Keycloak issuer constructed from keycloak.auth-server-url and keycloak
+    // ===================================================================
+    //      spring:
+    //        security:
+    //          oauth2:
+    //            resourceserver:
+    //              jwt:
+    //                issuer-uris:
+    //                  - http://localhost:8080/realms/my-realm
+    // ==================================================================
+    //      keycloak:
+    //        auth-server-url: http://localhost:8080
+    //        realm: my-realm
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // No CSRF tokens, because this is a stateless JWT API.
+            // no csrf because this is a stateless JWT API
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // Define authorization rules for endpoints and roles here. Adjust as needed.
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/public/**").permitAll() // open endpoints
-                .requestMatchers("/secured/admin").hasRole("ADMIN")
+                .requestMatchers("/secured/admin").hasRole("ADMIN") //keycloak roles may need a jwt converter
                 .requestMatchers("/secured/user").hasAnyRole("USER", "ADMIN")
-                .anyRequest().permitAll())
+                .anyRequest().authenticated())
 
             // validate incoming bearer tokens as JWTs.
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
@@ -74,8 +88,7 @@ public class SpringSecurityConfig {
             throw new IllegalStateException("Missing issuer URIs configuration and no Keycloak issuer configured");
         }
 
-        // Normalize and keep a set of allowed issuers. We avoid eagerly creating
-        // remote `JwtDecoder` instances (which perform network calls) during
+        // stop eagerly creating remote `JwtDecoder` instances (which perform network calls) during
         // bean creation because placeholder or unreachable issuer URIs will
         // otherwise fail application startup with errors like "Bad authority".
         var allowedIssuers = issuerUris.stream()
@@ -124,9 +137,11 @@ public class SpringSecurityConfig {
                 throw new BadJwtException("Missing issuer claim");
             }
             return issuer.textValue();
-        } catch (Exception ex) {
-            throw new BadJwtException("Unable to parse JWT issuer", ex);
-        }
+            } catch (BadJwtException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new BadJwtException("Unable to parse JWT issuer", ex);
+}
     }
 
     //Helper merthod to normalize issuer URIs for consistent comparison 

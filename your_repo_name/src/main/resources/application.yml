@@ -1,6 +1,8 @@
 spring:
   application:
     name: your_repo_name
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog.xml
   security:
     oauth2:
       resourceserver:
@@ -34,10 +36,6 @@ server:
 #      hibernate:
 #        dialect: org.hibernate.dialect.PostgreSQLDialect
 #
-# Flyway migrations (optional): add Flyway to `pom.xml` and enable here.
-#flyway:
-#  enabled: true
-#  locations: classpath:db/migration
 #
 # Notes:
 # - Tests using Testcontainers will override `spring.datasource.*` via DynamicPropertySource.

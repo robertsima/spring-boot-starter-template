@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example_project_name.dto.UserDTO;
+import com.example_project_name.model.Users;
 
-public interface UserRepository extends JpaRepository<UserDTO, String> {
-    List<UserDTO> findByName(String name); // Spring generates the query for you
+public interface UserRepository extends JpaRepository<Users, Long> {
+    List<Users> findByName(String name);
 }
 
