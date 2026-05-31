@@ -1,32 +1,29 @@
-# Spring Boot Starter - OIDC/OAuth + PostgreSQL 
-This project serves as a starter template for spring boot projects. It comes with a base configuration for integration with Postgres SQL as well as OAuth2/OIDC authentication. This specific template is designed around using keycloak for authentication/authorization but can be changed to fit whatever purpose. 
+# Spring Boot Starter - Stateless OIDC/OAuth(Single or multiple issuers), PostgreSQL, TestContainers, Liquibase, Docker
+This project serves as a boilerplate template for a scalable spring boot microservice. Configured for integration testing using Postgres SQL in TestContainers as well as OAuth2/OIDC JWT authentication. This specific template is designed around using keycloak for authentication/authorization but can be changed to fit whatever need. Also comes with a base docker image, yaml for kubernetes pods, liquibase(prod and test) starter, and sql init scripts. 
 
-The main goal of this project is to serve as a reusable base for secure, scalable microservices. If using this base, you just need to rename/restructure the project to fit your needs and plug in connection information wherever necessary. 
+The main goal of this project is to serve as a reusable base for secure microservices. If using this base, you just need to rename/restructure the project to fit your needs and plug in connection information wherever necessary. 
 
 For security purposes, you should never store credentials inside this project - only as an environment variable or key in some other place. 
 
 ## Goals
-- [x] Starter project structure
-- [ ] Testing structure
-- [ ] Config for integration and unit testing
-- [ ] Database config integration
-- [ ] Authentication config integration
+- [x] Starter src and test structure
+- [x] Boilerplate service, repository, and DTOs
+- [x] Config testcontainers to use postgres for scalable integration tests
+- [ ] Integrate OpenAPI for documentation and contract based development
+- [x] Sample database config in application.yml
+- [x] Stateless Spring security JWT authentication boilerplate to support single or multiple issuers
 - [ ] Launch file starter
 - [ ] Dockerfile for base image
 - [ ] Yaml config for base kubernetes pod
 
 ## How to use
-Clone this repo into your own branch and use it to develop your own project.
+1. Clone this repo into your own branch and use it to develop your own project.
 
 ```git clone (git project link)```
 
-1. Modify project folder structure names and file names to match your use case. 
+2. Modify project folder structure, change code, replace connection strings, and change /config files to match your use case. 
 
-2. Ensure the project is using your connection values by changing them in the .launch file. I recommend using env vars or something similar and referencing them in your launch file instead of storing raw connection data. 
-
-3. Make changes to /config files, dockerfile, and kubernetes yaml if they don't fit your use case. 
-
-4. Make your project! 
+3. Start developing! 
 
 If you use this and end up releasing, all I ask for is a reference to this project somehow. 
 
