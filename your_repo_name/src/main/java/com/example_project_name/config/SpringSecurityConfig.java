@@ -51,7 +51,12 @@ public class SpringSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // Define authorization rules for endpoints and roles here. Adjust as needed.
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/public/**").permitAll() // open endpoints
+                .requestMatchers("/public/**",
+                "/error",
+                "/swagger-ui/**", //swagger endpoints public for testing - consider securing or removing in production
+                "/swagger-ui.html",
+                "/v3/api-docs/**",
+                "/v3/api-docs.yaml").permitAll() // open endpoints
                 .requestMatchers("/secured/admin").hasRole("ADMIN") //keycloak roles may need a jwt converter
                 .requestMatchers("/secured/user").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated())

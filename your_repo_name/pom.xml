@@ -55,10 +55,6 @@
         <artifactId>spring-boot-starter-liquibase</artifactId>
     </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-rest</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -121,12 +117,26 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Test dependencies -->
+        <!-- OpenAPI dependencies -->
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-rest-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+
+        <!-- Test dependencies -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -154,12 +164,63 @@
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
+    <plugins>
+        <!-- OpenAPI Generator -->
+        <plugin>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <version>7.22.0</version>
+            <executions>
+                <execution>
+                    <id>generate-openapi-sources</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                    <configuration>
+                        <inputSpec>${project.basedir}/src/main/resources/openapi/openapi.yaml</inputSpec>
+                        <generatorName>spring</generatorName>
+
+                        <apiPackage>com.example_project_name.generated.api</apiPackage>
+                        <modelPackage>com.example_project_name.generated.model</modelPackage>
+
+                        <configOptions>
+                            <interfaceOnly>true</interfaceOnly>
+                            <useSpringBoot3>true</useSpringBoot3>
+                            <useTags>true</useTags>
+                            <dateLibrary>java8</dateLibrary>
+                        </configOptions>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- Makes IDE/Maven explicitly recognize generated OpenAPI Java sources -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <!-- <version>3.6.1</version> -->
+            <executions>
+                <execution>
+                    <id>add-openapi-generated-sources</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>add-source</goal>
+                    </goals>
+                    <configuration>
+                        <sources>
+                            <source>${project.build.directory}/generated-sources/openapi/src/main/java</source>
+                        </sources>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
     </build>
 
 </project>
