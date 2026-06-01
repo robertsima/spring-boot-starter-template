@@ -9,12 +9,11 @@ For security purposes, you should never store credentials inside this project - 
 - [x] Starter src and test structure
 - [x] Boilerplate service, repository, and DTOs
 - [x] Config testcontainers to use postgres for scalable integration tests
-- [ ] Integrate OpenAPI for documentation and contract based development
+- [x] Integrate OpenAPI for documentation and contract based development
 - [x] Sample database config in application.yml
 - [x] Stateless Spring security JWT authentication boilerplate to support single or multiple issuers
-- [ ] Launch file starter
-- [ ] Dockerfile for base image
-- [ ] Yaml config for base kubernetes pod
+- [x] Dockerfile for base image
+- [x] Yaml config for base pod using podman/kubernetes
 
 ## How to use
 1. Clone this repo into your own branch and use it to develop your own project.
