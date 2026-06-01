@@ -17,7 +17,7 @@ For security purposes, you should never store credentials inside this project - 
 - [x] Yaml config for base pod using podman/kubernetes
 
 ## How to use
-1. Clone this repo into your own branch and use it to develop your own project.
+1. Clone this repo into your own branch and use it to develop your own project OR download the zip. 
 
 ```git clone (git project link)```
 
