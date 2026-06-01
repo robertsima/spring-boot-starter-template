@@ -27,26 +27,152 @@ For security purposes, you should never store credentials inside this project - 
 If you use this and end up releasing, all I ask for is a reference to this project somehow. 
 
 ## Project Structure Breakdown
-Below is a breakdown of the project structure, not going in depth on specific file documentation. 
+
+This repository is organized as a reusable Spring Boot microservice template. The root contains repository-level files, while the actual Spring Boot project lives under `your_repo_name/`.
+
+```text
+spring-boot-starter-template/
+  .vscode/
+    # Optional VS Code workspace/editor settings
+
+  .gitignore
+  LICENSE
+  README.md
+
+  your_repo_name/
+    pom.xml
+    # Maven build configuration.
+    # Defines Spring Boot dependencies, PostgreSQL, Liquibase, Testcontainers,
+    # Spring Security OAuth2 Resource Server, OpenFeign, SpringDoc/OpenAPI,
+    # validation, and OpenAPI code generation.
+
+    mvnw
+    mvnw.cmd
+    .mvn/
+      wrapper/
+        maven-wrapper.properties
+        # Maven wrapper configuration so the project can be built
+        # without requiring Maven to be installed globally.
+
+    Dockerfile
+    # Multi-stage Docker build.
+    # Builds the Spring Boot jar with Maven, then runs it from a smaller
+    # Eclipse Temurin JRE runtime image.
+
+    podman/
+      podman-kube.yaml
+      # Local Podman/Kubernetes-style pod configuration.
+      # Includes a PostgreSQL pod, persistent volume claim, and Spring app pod.
+
+    src/
+      main/
+        java/
+          com/example_project_name/
+            app/
+              MyServiceApplication.java
+              # Main Spring Boot application entry point.
+
+            config/
+              # Application configuration classes.
+              # Includes security/auth configuration and other shared Spring beans.
+
+            controller/
+              # REST controllers that expose API endpoints.
+
+              dto/
+                # Request/response DTOs used by controllers.
+                # Keeps API contracts separate from persistence entities.
+
+            model/
+              # Domain/entity models.
+              # Typically used for Jakarta Persistence/Hibernate mappings.
+
+            repository/
+              # Spring Data repositories for database access.
+
+              specification/
+                # Spring Data Specifications for dynamic or more complex queries.
+
+            service/
+              # Service interfaces that define business operations.
+
+              serviceImpl/
+                # Concrete service implementations.
+                # Contains business logic and coordinates repositories/external clients.
+
+        resources/
+          application.yml
+          # Main application configuration.
+          # Contains environment-driven database, Liquibase, auth, and app settings.
+
+          db/
+            changelog/
+              # Liquibase changelog files for database schema management.
+
+          openapi/
+            openapi.yaml
+            # OpenAPI contract used for API documentation and code generation.
+
+      test/
+        java/
+          integration/
+            com/example_project_name/
+              # Integration tests, including database/application-context tests.
+
+          unit/
+            com/example_project_name/service/
+              # Unit tests for service-layer logic.
+
+        resources/
+          db/
+            changelog/
+              # Test-specific Liquibase changelogs/resources.
+```
+
+### Generated Sources
+
+During the Maven build, the OpenAPI generator creates Java sources under:
 
 ```text
 your_repo_name/
-  pom.xml
-  mvnw
-  mvnw.cmd
-  .mvn/wrapper/maven-wrapper.properties
-  src/
-    main/
-      java/com/example_project_name/
-        app/MyServiceApplication.java
-        config/ --> auth and security config files
-        controller/ --> controllers to define endpoints
-          dto/ --> DTOs used by controllers
-        model/ --> Jakarta/Hibernate mappings for models/entities to represent dbs
-        repository/ --> contains Spring Data repositories to generate boilerplate SQL
-          specification/ --> contains Spring Data specs for more complex SQL queries
-        service/ --> seperated interface pattern; contains service interfaces
-          serviceImpl/ --> contains associated service impls for decoupling
-      resources/application.yml --> replaced regular prop file with yml, contains connection template for sql and auth config
-    test/ --> same file structure as main, additional integration testing folder - unit tests handled in level above integration
+  target/
+    generated-sources/
+      openapi/
+        src/main/java/
+          com/example_project_name/generated/
+            api/
+            model/
 ```
+
+These files are generated from `src/main/resources/openapi/openapi.yaml` and should generally not be edited directly. Update the OpenAPI contract instead, then regenerate/build the project.
+
+### Main Areas
+
+| Area                                 | Purpose                                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------ |
+| `pom.xml`                            | Central Maven build file for dependencies, plugins, testing, and OpenAPI generation. |
+| `Dockerfile`                         | Builds and packages the Spring Boot service into a runnable container image.         |
+| `podman/podman-kube.yaml`            | Local Podman/Kubernetes-style setup for the Spring app and PostgreSQL.               |
+| `src/main/java`                      | Main application source code.                                                        |
+| `config`                             | Security, authentication, and shared Spring configuration.                           |
+| `controller`                         | API endpoint definitions.                                                            |
+| `controller/dto`                     | API request/response objects.                                                        |
+| `model`                              | Database-backed entities/domain models.                                              |
+| `repository`                         | Spring Data persistence layer.                                                       |
+| `repository/specification`           | Reusable dynamic query logic.                                                        |
+| `service`                            | Service interfaces for business operations.                                          |
+| `service/serviceImpl`                | Service implementation classes.                                                      |
+| `src/main/resources/application.yml` | Main YAML-based application configuration.                                           |
+| `src/main/resources/db/changelog`    | Liquibase database migration files.                                                  |
+| `src/main/resources/openapi`         | OpenAPI contract used for documentation and generated API/model classes.             |
+| `src/test/java/integration`          | Integration tests.                                                                   |
+| `src/test/java/unit`                 | Unit tests.                                                                          |
+| `src/test/resources`                 | Test-specific resources and database changelogs.                                     |
+
+### Notes
+
+* DTOs are separated from entities so API contracts are not tightly coupled to database models.
+* Liquibase changelogs are included to make database schema changes repeatable and version-controlled.
+* OpenAPI is used as both documentation and a source for generated API/model classes.
+* The Podman YAML is intended for local containerized development, while the Dockerfile provides the application image.
+* Secrets and real credentials should not be committed. Use environment variables or an external secret/configuration provider instead.
